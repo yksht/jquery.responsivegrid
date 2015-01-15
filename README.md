@@ -21,7 +21,7 @@ Responsive grid plugin
 		$('.grid').responsivegrid({
 			'column' : 4,
 			'gutter' : '5px',
-			'itemheight' : '80%',
+			'itemHeight' : '80%',
 			}
 		});
 	</script>
@@ -35,7 +35,7 @@ Responsive grid plugin
 					'options' : {
 						'column' : 6,
 						'gutter' : '20px',
-						'itemheight' : '80%',
+						'itemHeight' : '80%',
 					}
 				},
 				'tablet-landscape' : {
@@ -43,7 +43,7 @@ Responsive grid plugin
 					'options' : {
 						'column' : 4,
 						'gutter' : '15px',
-						'itemheight' : '70%',
+						'itemHeight' : '70%',
 					}
 				},
 				'tablet-portrate' : {
@@ -51,7 +51,7 @@ Responsive grid plugin
 					'options' : {
 						'column' : 3,
 						'gutter' : '10px',
-						'itemheight' : '60%',
+						'itemHeight' : '60%',
 					}
 				},
 				'mobile' : {
@@ -59,7 +59,7 @@ Responsive grid plugin
 					'options' : {
 						'column' : 2,
 						'gutter' : '5px',
-						'itemheight' : '50%',
+						'itemHeight' : '50%',
 					}
 				},
 			}
