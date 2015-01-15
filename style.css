@@ -1,0 +1,26 @@
+html, body {
+	height: 100%;
+	width: 100%;
+}
+body {
+	margin: 0;
+}
+
+.grid {
+	position: relative;
+}
+
+.grid {
+	
+}
+
+.grid-item {
+	position: absolute;
+	border: 1px solid gray;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
