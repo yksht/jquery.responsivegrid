@@ -6,7 +6,7 @@
 
 			column : 6,
 			gutter : '10px',
-			itemheight : '100%',
+			itemHeight : '100%',
 
 		},
 
@@ -95,9 +95,6 @@
 		methods : {
 			init : function(options){
 
-				// viewport width
-				bodyWidth = $(window).width();
-
 				$.extend(true, _.options, _.defaults);
 				$.extend(true, _.options, options);
 
@@ -149,7 +146,7 @@
 				_.options.gridWidth = $(_.options.grid).width();
 				_.options.gridGutter = _.functions.getPxValue(_.options.gutter, _.options.gridWidth);
 				_.options.gridItemWidth = Math.floor((_.options.gridWidth - (_.options.column - 1) * _.options.gridGutter) / _.options.column);
-				_.options.gridItemHeight = _.functions.getPxValue(_.options.itemheight, _.options.gridItemWidth);
+				_.options.gridItemHeight = _.functions.getPxValue(_.options.itemHeight, _.options.gridItemWidth);
 
 				$(_.options.grid).children(_.options.gridItemSelector).each(function(k){
 					var colspan = $(this).data('colspan') || 1;
