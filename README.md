@@ -67,10 +67,14 @@ Responsive grid plugin
 	</script>
 
 ### Options:
-	'column' - number of blocks per line. By default: 4
+	'column' : number of blocks per line
+	by default: 4
 	
-	'gutter' - space between blocks. You can use 'px' and '%' (percent from .grid block width). By default: 10px
+	'gutter' : space between blocks. You can use 'px' and '%' (percent from .grid block width)
+	By default: 10px
 	
-	'itemheight' - item height. You can use 'px' and '%' (percent from .grid-item block width). By default: 100%
+	'itemheight' : item height. You can use 'px' and '%' (percent from .grid-item block width)
+	by default: 100%
 	
-	'gridItemSelector' - selector for children blocks. By default: '.grid-item'
+	'gridItemSelector' : selector for children blocks
+	by default: '.grid-item'
