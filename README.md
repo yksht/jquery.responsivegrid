@@ -4,30 +4,30 @@ Responsive grid plugin
 
 
 ### Markup:
-`<div class="grid">
-	<div class="grid-item" data-colspan="2" data-rowspan="2"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="2"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="2"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
-	<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
-</div>`
+	<div class="grid">
+		<div class="grid-item" data-colspan="2" data-rowspan="2"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="2"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="2"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
+		<div class="grid-item" data-colspan="2" data-rowspan="1"></div>
+	</div>
 
 ### Using without breakpoints:
-	`<script type="text/javascript">
+	<script type="text/javascript">
 		$('.grid').responsivegrid({
 			'column' : 4,
 			'gutter' : '5px',
 			'itemheight' : '80%',
 			}
 		});
-	</script>`
+	</script>
 
 ### Using with breakpoints:
-	`<script type="text/javascript">
+	<script type="text/javascript">
 		$('.grid').responsivegrid({
 			'breakpoints': {
 				'desktop' : {
@@ -64,4 +64,4 @@ Responsive grid plugin
 				},
 			}
 		});
-	</script>`
+	</script>
