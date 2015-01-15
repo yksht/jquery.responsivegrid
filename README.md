@@ -73,7 +73,7 @@ Responsive grid plugin
 	'gutter' : space between blocks. You can use 'px' and '%' (percent from .grid block width)
 	By default: 10px
 	
-	'itemheight' : item height. You can use 'px' and '%' (percent from .grid-item block width)
+	'itemHeight' : item height. You can use 'px' and '%' (percent from .grid-item block width)
 	by default: 100%
 	
 	'gridItemSelector' : selector for children blocks
