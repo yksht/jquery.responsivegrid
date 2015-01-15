@@ -22,7 +22,6 @@ Responsive grid plugin
 			'column' : 4,
 			'gutter' : '5px',
 			'itemHeight' : '80%',
-			}
 		});
 	</script>
 
