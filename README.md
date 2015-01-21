@@ -75,5 +75,5 @@ Responsive grid plugin
 	'itemHeight' : item height. You can use 'px' and '%' (percent from .grid-item block width)
 	by default: 100%
 	
-	'gridItemSelector' : selector for children blocks
+	'itemSelector' : selector for children blocks
 	by default: '.grid-item'
