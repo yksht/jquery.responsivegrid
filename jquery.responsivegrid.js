@@ -1,68 +1,26 @@
 (function($){
 
-	var _ = {
-
+	var global = {
 		defaults : {
-
 			column : 6,
 			gutter : '10px',
 			itemHeight : '100%',
-
+			itemSelector : '.grid-item',
 		},
-
 		options : {
-
-			grid : null,
 			gridWidth : null,
 			gridHeight : null,
 			gridGutter : null,
-			gridSelector : '.grid',
-
 			gridItemWidth : null,
 			gridItemHeight : null,
-			gridItemSelector : '.grid-item',
-
 			gridMap : [],
-
-			bodyWidth : null,
-
 			breakpoints : [],
 			rangeValues : [],
-			currentbreakpoint : null,
-			
+			currentbreakpoint : {},
+			resizeDelay : 180,
+			resizeTimeout : null,
 		},
-
 		functions : {
-			parseBreakpoint : function(key, range){
-				// Invalid? Always fail.
-				if (typeof range != 'string')
-					condition = function(v) { return false; };
-				// Wildcard? Always succeed.
-				if (range == '*')
-					condition = function(v) { return true; };
-				// Less than or equal (-X)
-				else if (range.charAt(0) == '-'){
-					_.options.rangeValues[key] = parseInt(range.substring(1));
-					condition = function(v) { return (v <= _.options.rangeValues[key]); };
-				}
-				// Greater than or equal (X-)
-				else if (range.charAt(range.length - 1) == '-'){
-					_.options.rangeValues[key] = parseInt(range.substring(0, range.length - 1));
-					condition = function(v) { return (v >= _.options.rangeValues[key]); };
-				}
-				// Range (X-Y)
-				else if (~range.indexOf(range,'-')){
-					range = range.split('-');
-					_.options.rangeValues[key] = [parseInt(range[0]), parseInt(range[1])];
-					condition = function(v) { return (v >= _.options.rangeValues[key][0] && v <= _.options.rangeValues[key][1]); };
-				}
-				// Exact match (X)
-				else {
-					_.options.rangeValues[key] = parseInt(range);
-					condition = function(v) { return (v == _.options.rangeValues[key]); };
-				}
-				return condition;
-			},
 			isPx : function(value){
 				value = value.toLowerCase();
 				if (~value.indexOf('px')){
@@ -82,161 +40,173 @@
 				if (isNaN(size_)){
 					size_ = 0;
 				}
-				if (_.functions.isPercent(value)){
+				if (global.functions.isPercent(value)){
 					return Math.floor(size * size_ / 100);
 				}
-				if (_.functions.isPx(value)){
+				if (global.functions.isPx(value)){
 					return Math.floor(size_);
 				}
 				return 0;
 			},
-		},
+		}
+	} 
 
-		methods : {
-			init : function(options){
+	Grid = function(block, settings){
+		this.options = {};
+		this.options.grid = $(block);
+		this.init(settings);
+	}
 
-				$.extend(true, _.options, _.defaults);
-				$.extend(true, _.options, options);
-
-				return this.each(function(){
-
-					// setting grid options
-					_.options.grid = this;
-
-					// parsing breakpoints
-					_.options.currentbreakpoint = {};
-					$.each(_.options.breakpoints, function(key, breakpoint){
-						breakpoint.condition = _.functions.parseBreakpoint(key, breakpoint.range);
-					});
-
-					// resize function
-					_.methods.resize();
-					$(window).resize(function(){
-						_.methods.resize();
-					});
-
-				});
-
-			},
-			resize : function(){
-
-				bodyWidth = $(window).width();
-
-				// changing breakpoint
-				$.each(_.options.breakpoints, function(key, breakpoint){
-					if ((breakpoint.condition)(bodyWidth)){
-						if (breakpoint.range != _.options.currentbreakpoint.range){
-							_.options.currentbreakpoint = breakpoint;
-							$.extend(true, _.options, breakpoint.options);
-						}
-					}
-				});
-
-				if (_.options.column < 1) {
-					_.options.column = 1;
+	Grid.prototype = {
+		// initalizing
+		init : function(settings){
+			var self = this;
+			// applying default settings
+			$.extend(true, this.options, global.options);
+			$.extend(true, this.options, global.defaults);
+			$.extend(true, this.options, settings);
+			// parsing breakpoints
+			$.each(this.options.breakpoints, function(key, breakpoint){
+				breakpoint.condition = self.parseBreakpoint(key, breakpoint.range);
+			});
+			// applying main methods
+			this.resize();
+			// applying main methods when resizing finished
+			$(window).resize(function(){
+				if (self.options.resizeTimeout != null){
+					clearTimeout(self.options.resizeTimeout);
 				}
-
-				_.methods.initMap();
-				_.methods.calculateMap();
-				_.methods.renderGrid();
-
-			},
-			calculateMap : function(){
-
-				_.options.gridWidth = $(_.options.grid).width();
-				_.options.gridGutter = _.functions.getPxValue(_.options.gutter, _.options.gridWidth);
-				_.options.gridItemWidth = Math.floor((_.options.gridWidth - (_.options.column - 1) * _.options.gridGutter) / _.options.column);
-				_.options.gridItemHeight = _.functions.getPxValue(_.options.itemHeight, _.options.gridItemWidth);
-
-				$(_.options.grid).children(_.options.gridItemSelector).each(function(k){
-					var colspan = $(this).data('colspan') || 1;
-					var rowspan = $(this).data('rowspan') || 1;
-					var added = false;
-					var i, j;
-					for (i = 0; i < _.options.gridMap.length; ++i){
-						for (j = 0; j < _.options.gridMap[i].length; ++j){
-							if (_.methods.isFreeMap(i, j, colspan, rowspan)){
-								_.methods.addElementToMap(i, j, colspan, rowspan, {
-									'element' : this,
-									'colspan' : colspan,
-									'rowspan' : rowspan,
-								});
-								added = true;
-								break;
+				self.options.resizeTimeout = setTimeout(function(){
+					self.resize();
+				}, self.options.resizeDelay);
+			});
+		},
+		// resizing method
+		resize : function(){
+			var self = this;
+			this.options.resizeTimeout = null;
+			// getting current breakpoint
+			$.each(this.options.breakpoints, function(key, breakpoint){
+				if ((breakpoint.condition)($(window).width())){
+					if (breakpoint.range != self.options.currentbreakpoint.range){
+						self.options.currentbreakpoint = breakpoint;
+						$.extend(true, self.options, breakpoint.options);
+					}
+				}
+			});
+			// calculating main sizes
+			this.options.gridWidth = this.options.grid.width();
+			this.options.gridGutter = global.functions.getPxValue(this.options.gutter, this.options.gridWidth);
+			this.options.gridItemWidth = Math.floor((this.options.gridWidth - (this.options.column - 1) * this.options.gridGutter) / this.options.column);
+			this.options.gridItemHeight = global.functions.getPxValue(this.options.itemHeight, this.options.gridItemWidth);
+			// applying main methods
+			this.initMap();
+			this.calculateMap();
+			this.renderGrid();
+		},
+		// creating the map
+		calculateMap : function(){
+			var self = this;
+			// adding blocks to the map
+			this.options.grid.children(this.options.itemSelector).each(function(k){
+				var colspan = $(this).data('colspan') || 1;
+				var rowspan = $(this).data('rowspan') || 1;
+				colspan = Math.min(colspan, self.options.column);
+				var added = false;
+				var i, j;
+				for (i = 0; i < self.options.gridMap.length; ++i){
+					for (j = 0; j < self.options.gridMap[i].length; ++j){
+						if (self.isFreeMap(i, j, colspan, rowspan)){
+							if (colspan == 3){
+								console.log("123");
+							}
+							self.addBlockToMap(i, j, colspan, rowspan, {
+								'block' : this,
+								'colspan' : colspan,
+								'rowspan' : rowspan,
+							});
+							added = true;
+							break;
+						} else {
+							if (colspan == 3){
+								console.log("456");
 							}
 						}
-						if (added){
-							break;
-						}
 					}
-				});
-
-			},
-			renderGrid : function(){
-
-				_.methods.removeEmptyRows();
-
-				$(_.options.grid).css({
-					'height' : _.methods.calculateItemHeight(_.options.gridMap.length),
-				});
-
-				var i, j;
-				for (i = 0; i < _.options.gridMap.length; ++i){
-					for (j = 0; j < _.options.gridMap[i].length; ++j){
-						if (typeof(_.options.gridMap[i][j]) == 'object'){
-							$(_.options.gridMap[i][j].element).css({
-								'top' : _.methods.calculateItemTop(i),
-								'left' : _.methods.calculateItemLeft(j),
-								'width' : _.methods.calculateItemWidth(_.options.gridMap[i][j].colspan),
-								'height' : _.methods.calculateItemHeight(_.options.gridMap[i][j].rowspan),
-							});
-						}
-					}
-				}
-
-			},			
-			initMap : function(){
-				var length = 0;
-				$(_.options.grid).children(_.options.gridItemSelector).each(function(){
-					length += $(this).data('rowspan') || 1;
-				});
-				_.options.gridMap = new Array(length);
-				var i;
-				for (i = 0; i < _.options.gridMap.length; ++i){
-					_.options.gridMap[i] = new Array(_.options.column);
-				}
-			},
-			removeEmptyRows : function(){
-				var i, j;
-				for (i = 0; i < _.options.gridMap.length; ++i){
-					var isFree = true;
-					for (j = 0; j < _.options.gridMap[i].length; ++j){
-						if (_.options.gridMap[i][j] != undefined){
-							isFree = false;
-							break;
-						}
-					}
-					if (isFree){
+					if (added){
 						break;
 					}
 				}
-				if (isFree) {
-					var length = _.options.gridMap.length - 1;
-					for (var k = length; k >= i; --k){
-						_.options.gridMap.pop();
+			});
+		},
+		// rendering the grid
+		renderGrid : function(){
+			// removing empty rows from the map
+			this.removeEmptyRows();
+			this.options.grid.css({
+				'height' : this.calculateItemHeight(this.options.gridMap.length),
+			});
+			// rendering all blocks
+			var i, j;
+			for (i = 0; i < this.options.gridMap.length; ++i){
+				for (j = 0; j < this.options.gridMap[i].length; ++j){
+					if (typeof(this.options.gridMap[i][j]) == 'object'){
+						$(this.options.gridMap[i][j].block).css({
+							'top' : this.calculateItemTop(i),
+							'left' : this.calculateItemLeft(j),
+							'width' : this.calculateItemWidth(this.options.gridMap[i][j].colspan),
+							'height' : this.calculateItemHeight(this.options.gridMap[i][j].rowspan),
+						});
 					}
 				}
-			},	
-			isFreeMap : function(i_, j_, colspan, rowspan){
+			}
+		},
+		// initializing the map
+		initMap : function(){
+			var length = 0;
+			this.options.grid.children(this.options.itemSelector).each(function(){
+				length += $(this).data('rowspan') || 1;
+			});
+			this.options.gridMap = new Array(length);
+			var i;
+			for (i = 0; i < this.options.gridMap.length; ++i){
+				this.options.gridMap[i] = new Array(this.options.column);
+			}
+		},
+		// removing empty rows from the map
+		removeEmptyRows : function(){
+			var i, j;
+			// searching first empty row
+			for (i = 0; i < this.options.gridMap.length; ++i){
 				var isFree = true;
-				var i, j;
+				for (j = 0; j < this.options.gridMap[i].length; ++j){
+					if (this.options.gridMap[i][j] != undefined){
+						isFree = false;
+						break;
+					}
+				}
+				if (isFree){
+					break;
+				}
+			}
+			// removing all rows after first empty row
+			if (isFree) {
+				var length = this.options.gridMap.length - 1;
+				for (var k = length; k >= i; --k){
+					this.options.gridMap.pop();
+				}
+			}
+		},
+		// searching free space for new block
+		isFreeMap : function(i_, j_, colspan, rowspan){
+			var isFree = true;
+			var i, j;
+			if (colspan > this.options.column - j_){
+				isFree = false;
+			} else {
 				for (i = i_; i < i_ + rowspan; ++i){
 					for (j = j_; j < j_ + colspan; ++j){
-						if (_.options.gridMap[i][j] != undefined){
-							isFree = false;
-							break;
-						}
-						if (j + colspan - 1 > _.options.gridMap[i].length){
+						if (this.options.gridMap[i][j] != undefined){
 							isFree = false;
 							break;
 						}
@@ -245,39 +215,78 @@
 						break;
 					}
 				}
-				return isFree;
-			},
-			addElementToMap : function(i_, j_, colspan, rowspan, object){
-				_.options.gridMap[i_][j_] = object;
-				var i, j;
-				for (i = i_; i < i_ + rowspan; ++i){
-					for (j = j_; j < j_ + colspan; ++j){
-						if (i != i_ || j != j_){
-							_.options.gridMap[i][j] = 0;
-						}
+			}
+			return isFree;
+		},
+		// adding block to the map
+		addBlockToMap : function(i_, j_, colspan, rowspan, object){
+			this.options.gridMap[i_][j_] = object;
+			var i, j;
+			for (i = i_; i < i_ + rowspan; ++i){
+				for (j = j_; j < j_ + colspan; ++j){
+					if (i != i_ || j != j_){
+						this.options.gridMap[i][j] = 0;
 					}
-				} 
-			},
-			calculateItemWidth : function(colspan){
-				return _.options.gridItemWidth * colspan + _.options.gridGutter * (colspan - 1);
-			},
-			calculateItemHeight : function(rowspan){
-				return _.options.gridItemHeight * rowspan + _.options.gridGutter * (rowspan - 1);
-			},
-			calculateItemTop : function(row){
-				return (row == 0) ? 0 : _.methods.calculateItemHeight(row) + _.options.gridGutter;
-			},
-			calculateItemLeft : function(col){
-				return (col == 0) ? 0 : _.methods.calculateItemWidth(col) + _.options.gridGutter;
-			},
-		}
-
+				}
+			} 
+		},
+		// calculating block's width
+		calculateItemWidth : function(colspan){
+			return this.options.gridItemWidth * colspan + this.options.gridGutter * (colspan - 1);
+		},
+		// calculating block's height
+		calculateItemHeight : function(rowspan){
+			return this.options.gridItemHeight * rowspan + this.options.gridGutter * (rowspan - 1);
+		},
+		// calculating block's top coordinate
+		calculateItemTop : function(row){
+			return (row == 0) ? 0 : this.calculateItemHeight(row) + this.options.gridGutter;
+		},
+		// calculating block's left coordinate
+		calculateItemLeft : function(col){
+			return (col == 0) ? 0 : this.calculateItemWidth(col) + this.options.gridGutter;
+		},
+		// parsing breakpoints			
+		parseBreakpoint : function(key, range){
+			var self = this;
+			// Invalid? Always fail.
+			if (typeof range != 'string')
+				condition = function(v) { return false; };
+			// Wildcard? Always succeed.
+			if (range == '*')
+				condition = function(v) { return true; };
+			// Less than or equal (-X)
+			else if (range.charAt(0) == '-'){
+				this.options.rangeValues[key] = parseInt(range.substring(1));
+				condition = function(v) { return (v <= self.options.rangeValues[key]); };
+			}
+			// Greater than or equal (X-)
+			else if (range.charAt(range.length - 1) == '-'){
+				this.options.rangeValues[key] = parseInt(range.substring(0, range.length - 1));
+				condition = function(v) { return (v >= self.options.rangeValues[key]); };
+			}
+			// Range (X-Y)
+			else if (~range.indexOf(range,'-')){
+				range = range.split('-');
+				this.options.rangeValues[key] = [parseInt(range[0]), parseInt(range[1])];
+				condition = function(v) { return (v >= self.options.rangeValues[key][0] && v <= self.options.rangeValues[key][1]); };
+			}
+			// Exact match (X)
+			else {
+				this.options.rangeValues[key] = parseInt(range);
+				condition = function(v) { return (v == self.options.rangeValues[key]); };
+			}
+			return condition;
+		},
 	}
 
-	$.fn.responsivegrid = function(options){
-		if (typeof options === 'object'){
-			return _.methods.init.apply(this, arguments);
+	$.fn.responsivegrid = function(settings){
+		if (typeof settings === 'object'){
+			this.each(function(){
+				new Grid(this, settings);
+			});
 		}
+		return this;
 	}
 
 })(jQuery);
