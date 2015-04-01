@@ -117,9 +117,6 @@
 				for (i = 0; i < self.options.gridMap.length; ++i){
 					for (j = 0; j < self.options.gridMap[i].length; ++j){
 						if (self.isFreeMap(i, j, colspan, rowspan)){
-							if (colspan == 3){
-								console.log("123");
-							}
 							self.addBlockToMap(i, j, colspan, rowspan, {
 								'block' : this,
 								'colspan' : colspan,
@@ -127,10 +124,6 @@
 							});
 							added = true;
 							break;
-						} else {
-							if (colspan == 3){
-								console.log("456");
-							}
 						}
 					}
 					if (added){
@@ -146,6 +139,10 @@
 			this.options.grid.css({
 				'height' : this.calculateItemHeight(this.options.gridMap.length),
 			});
+			// checking if horizontal scrollbar appears
+			if ($(window).width() < this.options.gridWidth){
+				this.resize();
+			}
 			// rendering all blocks
 			var i, j;
 			for (i = 0; i < this.options.gridMap.length; ++i){
