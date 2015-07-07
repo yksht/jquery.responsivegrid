@@ -87,7 +87,7 @@
 			this.options.resizeTimeout = null;
 			// getting current breakpoint
 			$.each(this.options.breakpoints, function(key, breakpoint){
-				if ((breakpoint.condition)($(window).width())){
+				if ((breakpoint.condition)(document.body.clientWidth)){
 					if (breakpoint.range != self.options.currentbreakpoint.range){
 						self.options.currentbreakpoint = breakpoint;
 						$.extend(true, self.options, breakpoint.options);
@@ -95,6 +95,9 @@
 				}
 			});
 			// calculating main sizes
+			this.options.grid.css({
+				'position' : 'relative'
+			});
 			this.options.gridWidth = this.options.grid.width();
 			this.options.gridGutter = global.functions.getPxValue(this.options.gutter, this.options.gridWidth);
 			this.options.gridItemWidth = Math.floor((this.options.gridWidth - (this.options.column - 1) * this.options.gridGutter) / this.options.column);
@@ -108,7 +111,9 @@
 		calculateMap : function(){
 			var self = this;
 			// adding blocks to the map
-			this.options.grid.children(this.options.itemSelector).each(function(k){
+			this.options.grid.children(this.options.itemSelector).css({
+				'position' : 'absolute'
+			}).each(function(k){
 				var colspan = $(this).data('colspan') || 1;
 				var rowspan = $(this).data('rowspan') || 1;
 				colspan = Math.min(colspan, self.options.column);
@@ -140,7 +145,7 @@
 				'height' : this.calculateItemHeight(this.options.gridMap.length),
 			});
 			// checking if horizontal scrollbar appears
-			if ($(window).width() < this.options.gridWidth){
+			if (document.body.clientWidth < this.options.gridWidth){
 				this.resize();
 			}
 			// rendering all blocks
@@ -195,6 +200,7 @@
 			}
 		},
 		// searching free space for new block
+		// i_, j_: starting coords for searching
 		isFreeMap : function(i_, j_, colspan, rowspan){
 			var isFree = true;
 			var i, j;
@@ -216,6 +222,7 @@
 			return isFree;
 		},
 		// adding block to the map
+		// i_, j_: coords for inserting
 		addBlockToMap : function(i_, j_, colspan, rowspan, object){
 			this.options.gridMap[i_][j_] = object;
 			var i, j;

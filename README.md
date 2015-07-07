@@ -77,3 +77,7 @@ Responsive grid plugin
 	
 	'itemSelector' : selector for children blocks
 	by default: '.grid-item'
+
+
+
+IE9+, Chrome, FF, Safari
