@@ -49,13 +49,13 @@
 				return 0;
 			},
 		}
-	} 
+	};
 
 	Grid = function(block, settings){
 		this.options = {};
 		this.options.grid = $(block);
 		this.init(settings);
-	}
+	};
 
 	Grid.prototype = {
 		// initalizing
@@ -73,7 +73,7 @@
 			this.resize();
 			// applying main methods when resizing finished
 			$(window).resize(function(){
-				if (self.options.resizeTimeout != null){
+				if (self.options.resizeTimeout !== null){
 					clearTimeout(self.options.resizeTimeout);
 				}
 				self.options.resizeTimeout = setTimeout(function(){
@@ -178,11 +178,12 @@
 		// removing empty rows from the map
 		removeEmptyRows : function(){
 			var i, j;
+			var isFree = null;
 			// searching first empty row
 			for (i = 0; i < this.options.gridMap.length; ++i){
-				var isFree = true;
+				isFree = true;
 				for (j = 0; j < this.options.gridMap[i].length; ++j){
-					if (this.options.gridMap[i][j] != undefined){
+					if (this.options.gridMap[i][j] !== undefined){
 						isFree = false;
 						break;
 					}
@@ -209,7 +210,7 @@
 			} else {
 				for (i = i_; i < i_ + rowspan; ++i){
 					for (j = j_; j < j_ + colspan; ++j){
-						if (this.options.gridMap[i][j] != undefined){
+						if (this.options.gridMap[i][j] !== undefined){
 							isFree = false;
 							break;
 						}
@@ -232,7 +233,7 @@
 						this.options.gridMap[i][j] = 0;
 					}
 				}
-			} 
+			}
 		},
 		// calculating block's width
 		calculateItemWidth : function(colspan){
@@ -244,13 +245,13 @@
 		},
 		// calculating block's top coordinate
 		calculateItemTop : function(row){
-			return (row == 0) ? 0 : this.calculateItemHeight(row) + this.options.gridGutter;
+			return (row === 0) ? 0 : this.calculateItemHeight(row) + this.options.gridGutter;
 		},
 		// calculating block's left coordinate
 		calculateItemLeft : function(col){
-			return (col == 0) ? 0 : this.calculateItemWidth(col) + this.options.gridGutter;
+			return (col === 0) ? 0 : this.calculateItemWidth(col) + this.options.gridGutter;
 		},
-		// parsing breakpoints			
+		// parsing breakpoints
 		parseBreakpoint : function(key, range){
 			var self = this;
 			// Invalid? Always fail.
@@ -282,7 +283,7 @@
 			}
 			return condition;
 		},
-	}
+	};
 
 	$.fn.responsivegrid = function(settings){
 		if (typeof settings === 'object'){
@@ -291,6 +292,6 @@
 			});
 		}
 		return this;
-	}
+	};
 
 })(jQuery);
