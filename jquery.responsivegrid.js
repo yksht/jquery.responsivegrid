@@ -87,7 +87,7 @@
 			this.options.resizeTimeout = null;
 			// getting current breakpoint
 			$.each(this.options.breakpoints, function(key, breakpoint){
-				if ((breakpoint.condition)(document.body.clientWidth)){
+				if ((breakpoint.condition)(window.innerWidth)){
 					if (breakpoint.range != self.options.currentbreakpoint.range){
 						self.options.currentbreakpoint = breakpoint;
 						$.extend(true, self.options, breakpoint.options);
