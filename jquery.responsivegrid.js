@@ -100,7 +100,7 @@
 			});
 			this.options.gridWidth = this.options.grid.width();
 			this.options.gridGutter = global.functions.getPxValue(this.options.gutter, this.options.gridWidth);
-			this.options.gridItemWidth = Math.floor((this.options.gridWidth - (this.options.column - 1) * this.options.gridGutter) / this.options.column);
+			this.options.gridItemWidth = (this.options.gridWidth - (this.options.column - 1) * this.options.gridGutter) / this.options.column;
 			this.options.gridItemHeight = global.functions.getPxValue(this.options.itemHeight, this.options.gridItemWidth);
 			// applying main methods
 			this.initMap();
@@ -144,10 +144,7 @@
 			this.options.grid.css({
 				'height' : this.calculateItemHeight(this.options.gridMap.length),
 			});
-			// checking if horizontal scrollbar appears
-			if (document.body.clientWidth < this.options.gridWidth){
-				this.resize();
-			}
+
 			// rendering all blocks
 			var i, j;
 			for (i = 0; i < this.options.gridMap.length; ++i){
@@ -237,7 +234,7 @@
 		},
 		// calculating block's width
 		calculateItemWidth : function(colspan){
-			return this.options.gridItemWidth * colspan + this.options.gridGutter * (colspan - 1);
+			return Math.round(this.options.gridItemWidth * colspan + this.options.gridGutter * (colspan - 1));
 		},
 		// calculating block's height
 		calculateItemHeight : function(rowspan){
